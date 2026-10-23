@@ -37,6 +37,10 @@ function Controller:Select(filePath)
     controller.LeftHand.ImageTransparency = 0
     self.CurrentFile = filePath
     self.CurrentSong = Song.new(filePath)
+
+    -- Picking a song immediately begins playback (mobile-friendly)
+    self.CurrentSong:Play()
+
     self.FileLoaded:Fire(self.CurrentSong)
     self:Update()
     Preview:Draw(self.CurrentSong)

@@ -215,6 +215,9 @@ function Song:Play()
         self:JumpTo(0)
     end
 
+    -- Guard against duplicate render connections when Play is re-invoked
+    self:Pause()
+
     self._updateConnection = RunService.RenderStepped:Connect(function(dt)
         self:Update(self.TimePosition, self._lastTimePosition)
         self:Step(dt)

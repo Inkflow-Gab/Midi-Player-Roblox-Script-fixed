@@ -47,17 +47,25 @@ function Sidebar:CreateElement(filePath)
         element.Selection.Size = UDim2.fromOffset(3, 0)
     end
 
-    element.InputBegan:Connect(function(input)
-        if (Click.isPointer(input)) then
-            FastTween(element, tweenInfo, { BackgroundTransparency = 0.5 })
-            Controller:Select(filePath)
-        end
-    end)
+    -- Touch-safe activation: executors on touch devices can swallow
+    -- InputBegan taps meant for plain Frames inside a ScrollingFrame, so an
+    -- invisible button overlay carries the tap via `.Activated` — the same
+    -- signal every other control in this GUI relies on.
+    local tapper = Instance.new("TextButton")
+    tapper.Name = "Tapper"
+    tapper.BackgroundTransparency = 1
+    tapper.Text = ""
+    tapper.AutoButtonColor = false
+    tapper.Size = UDim2.fromScale(1, 1)
+    tapper.ZIndex = element.ZIndex + 1
+    tapper.Parent = element
 
-    element.InputEnded:Connect(function(input)
-        if (Click.isPointer(input)) then
+    Click.bind(tapper, function()
+        FastTween(element, tweenInfo, { BackgroundTransparency = 0.5 })
+        Controller:Select(filePath)
+        task.delay(0.15, function()
             FastTween(element, tweenInfo, { BackgroundTransparency = 0.75 })
-        end
+        end)
     end)
 
     element.MouseEnter:Connect(function()

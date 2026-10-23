@@ -2,15 +2,22 @@ local Rostruct = (function() local a={_G={}}setmetatable(a,{__index=function(sel
 
 -- Use the local copy of the source when available; otherwise, fetch it from GitHub
 if isfolder("MidiPlayer") then
+	print("[MIDI - IMPROVISED BY GAB] Using the local 'MidiPlayer' folder")
 	local package = Rostruct.open("MidiPlayer/")
 	package:build("src/", { Name = "MidiPlayer" })
 	package:start()
 else
+	print("[MIDI - IMPROVISED BY GAB] Downloading the script pack from GitHub (first run only)...")
 	Rostruct.fetchLatest("Inkflow-Gab", "Midi-Player-Roblox-Script-fixed")
 		:andThen(function(package)
-			package:build("src/", { Name = "MidiPlayer" })
+			-- The source tree sits under "MidiPlayer/src/" inside the repository
+			package:build("MidiPlayer/src/", { Name = "MidiPlayer" })
 			package:start()
+			print("[MIDI - IMPROVISED BY GAB] Loaded successfully")
 			return package
 		end)
-		:expect()
+		:catch(function(err)
+			warn("[MIDI - IMPROVISED BY GAB] Download failed: " .. tostring(err))
+			warn("Try again in a minute, or place the 'MidiPlayer' folder from the repository into your Workspace as a fallback.")
+		end)
 end
